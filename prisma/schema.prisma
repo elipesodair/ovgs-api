@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SalesOrderStatus {
+  CRIADA
+  PLANEJADA
+  AGENDADA
+  EM_TRANSPORTE
+  ENTREGUE
+}
+
+model Customer {
+  id          Int       @id @default(autoincrement())
+  name        String
+  createdAt   DateTime  @default(now())
+
+  salesOrders SalesOrder[]
+}
+
+model TransportType {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  createdAt   DateTime  @default(now())
+
+  salesOrders SalesOrder[]
+}
+
+model Item {
+  id        Int      @id @default(autoincrement())
+  sku       String   @unique
+  name      String
+
+  orderItems SalesOrderItem[]
+}
+
+model SalesOrder {
+  id              Int               @id @default(autoincrement())
+  customerId      Int
+  transportTypeId Int
+  status          SalesOrderStatus  @default(CRIADA)
+  createdAt       DateTime          @default(now())
+
+  customer        Customer          @relation(fields: [customerId], references: [id])
+  transportType   TransportType     @relation(fields: [transportTypeId], references: [id])
+
+  items           SalesOrderItem[]
+  schedule        Schedule?
+}
+
+model SalesOrderItem {
+  salesOrderId Int
+  itemId       Int
+  quantity     Int
+
+  salesOrder   SalesOrder @relation(fields: [salesOrderId], references: [id])
+  item         Item       @relation(fields: [itemId], references: [id])
+
+  @@id([salesOrderId, itemId])
+}
+
+model Schedule {
+  id           Int       @id @default(autoincrement())
+  salesOrderId Int       @unique
+  deliveryDate DateTime
+  timeWindow   String
+  confirmed    Boolean   @default(false)
+
+  salesOrder   SalesOrder @relation(fields: [salesOrderId], references: [id])
+}
+
+model AuditLog {
+  id          Int       @id @default(autoincrement())
+  entity      String
+  action      String
+  beforeState String?
+  afterState  String?
+  createdAt   DateTime  @default(now())
+}
