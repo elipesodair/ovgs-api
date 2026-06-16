@@ -3,9 +3,7 @@ import { TransportTypesService } from './transport-types.service';
 
 @Controller('transport-types')
 export class TransportTypesController {
-  constructor(
-    private readonly transportTypesService: TransportTypesService,
-  ) {}
+  constructor(private readonly transportTypesService: TransportTypesService) {}
 
   @Post()
   create(

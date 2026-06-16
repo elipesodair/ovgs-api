@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SalesOrderStatus } from '@prisma/client';
 
 @Injectable()
 export class SalesOrdersService {
@@ -18,11 +19,7 @@ export class SalesOrdersService {
     });
   }
 
-  async addItem(
-    salesOrderId: number,
-    itemId: number,
-    quantity: number,
-  ) {
+  async addItem(salesOrderId: number, itemId: number, quantity: number) {
     return this.prisma.salesOrderItem.create({
       data: {
         salesOrderId,
@@ -33,19 +30,19 @@ export class SalesOrdersService {
   }
 
   async findAll() {
-  return this.prisma.salesOrder.findMany({
-    include: {
-      customer: true,
-      transportType: true,
-      items: {
-        include: {
-          item: true,
+    return this.prisma.salesOrder.findMany({
+      include: {
+        customer: true,
+        transportType: true,
+        items: {
+          include: {
+            item: true,
+          },
         },
+        schedule: true,
       },
-      schedule: true,
-    },
-  });
-}
+    });
+  }
 
   async findOne(id: number) {
     return this.prisma.salesOrder.findUnique({
@@ -91,22 +88,18 @@ export class SalesOrdersService {
     return this.prisma.salesOrder.update({
       where: { id },
       data: {
-        status: status as any,
+        status: status as SalesOrderStatus,
       },
     });
   }
 
-  async schedule(
-  salesOrderId: number,
-  deliveryDate: Date,
-  timeWindow: string,
-) {
-  return this.prisma.schedule.create({
-    data: {
-      salesOrderId,
-      deliveryDate,
-      timeWindow,
-    },
-  });
-}
+  async schedule(salesOrderId: number, deliveryDate: Date, timeWindow: string) {
+    return this.prisma.schedule.create({
+      data: {
+        salesOrderId,
+        deliveryDate,
+        timeWindow,
+      },
+    });
+  }
 }

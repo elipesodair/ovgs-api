@@ -11,9 +11,7 @@ import { SalesOrdersService } from './sales-orders.service';
 
 @Controller('sales-orders')
 export class SalesOrdersController {
-  constructor(
-    private readonly salesOrdersService: SalesOrdersService,
-  ) {}
+  constructor(private readonly salesOrdersService: SalesOrdersService) {}
 
   @Post()
   create(
@@ -38,11 +36,7 @@ export class SalesOrdersController {
       quantity: number;
     },
   ) {
-    return this.salesOrdersService.addItem(
-      id,
-      body.itemId,
-      body.quantity,
-    );
+    return this.salesOrdersService.addItem(id, body.itemId, body.quantity);
   }
 
   @Get()
@@ -51,9 +45,7 @@ export class SalesOrdersController {
   }
 
   @Get(':id')
-  findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.salesOrdersService.findOne(id);
   }
 
@@ -65,25 +57,22 @@ export class SalesOrdersController {
       status: string;
     },
   ) {
-    return this.salesOrdersService.updateStatus(
-      id,
-      body.status,
-    );
+    return this.salesOrdersService.updateStatus(id, body.status);
   }
 
   @Post(':id/schedule')
-schedule(
-  @Param('id', ParseIntPipe) id: number,
-  @Body()
-  body: {
-    deliveryDate: string;
-    timeWindow: string;
-  },
-) {
-  return this.salesOrdersService.schedule(
-    id,
-    new Date(body.deliveryDate),
-    body.timeWindow,
-  );
-}
+  schedule(
+    @Param('id', ParseIntPipe) id: number,
+    @Body()
+    body: {
+      deliveryDate: string;
+      timeWindow: string;
+    },
+  ) {
+    return this.salesOrdersService.schedule(
+      id,
+      new Date(body.deliveryDate),
+      body.timeWindow,
+    );
+  }
 }
